@@ -1,0 +1,38 @@
+FROM amd64/python:3.7-slim-buster
+
+WORKDIR /app
+
+
+RUN apt-get update && \
+    apt-get install -y \
+        libcurl4-openssl-dev \
+        libboost-python-dev \
+        libgtk2.0-dev \
+        libglib2.0-0 curl
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN apt-get update 
+RUN ACCEPT_EULA=Y apt-get install msodbcsql17 -y
+RUN ACCEPT_EULA=Y apt-get install mssql-tools -y
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile && echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+
+RUN apt-get install -y build-essential cmake \
+        libopenblas-dev gcc unixodbc-dev python3-dev \
+        liblapack-dev librdkafka-dev python-dev
+
+ENV TZ 'America/Argentina/Buenos_Aires'
+
+RUN echo $TZ > /etc/timezone && \
+    apt-get update && apt-get install -y tzdata && \
+    rm /etc/localtime && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get clean
+
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY . .
+
+CMD [ "python3", "-u", "./main.py" ]

@@ -1,0 +1,8 @@
+azure-iot-device~=2.0.0
+numpy
+opencv-python
+opencv-contrib-python
+redis
+scipy
+pyodbc
+pandas
