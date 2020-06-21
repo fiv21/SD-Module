@@ -45,12 +45,12 @@ SQL_DBNAME = str(os.getenv('SQL_DBNAME',''))
 SQL_USERID = str(os.getenv('SQL_USERID',''))
 SQL_PASSWD = str(os.getenv('SQL_PASSWD',''))
 
-
 if DEBUG_MODE == 'True':
+    CAMERA_PATH = str(os.getenv('CAMERA_PATH','./videoTest/testingSocDist.mp4'))
     logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 else:
+    CAMERA_PATH = str(os.getenv('CAMERA_PATH',''))
     logging.basicConfig(format=FORMAT, level=logging.ERROR)
-
 
 anchorYOLOv3 = 32
 anchorSetting = (anchorYOLOv3*13, anchorYOLOv3*13) # 416 x 416 optimal parameter
@@ -96,8 +96,12 @@ def connectSQLServer(driver, server, db, user, pwd):
 
 def getTransformationMatrix(CamID):
     ## TO DO: Make this function look for a matrix in SQL Server
-    testTransformationMatrix = np.load('testingVideoPerspectiveTransformMatrix.npy')
-    arr = np.load('testingVideoPerspectiveTransformMatrix_arr.npy')
+    if(CAMERA_PATH =='./videoTest/testingSocDist.mp4'):
+        testTransformationMatrix = np.load('testingVideoPerspectiveTransformMatrix.npy')
+        arr = np.load('testingVideoPerspectiveTransformMatrix_arr.npy')
+    else:
+        testTransformationMatrix = np.load('RTSP-Cam_mtx.npy')
+        arr = np.load('RTSP-Cam_arr.npy') 
     return testTransformationMatrix, arr
 
 def getMinSocDist(CamID):
